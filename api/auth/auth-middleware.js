@@ -18,8 +18,8 @@ function restricted() {
     "message": "Username taken"
   }
 */
-function checkUsernameFree() {
-
+function checkUsernameFree(req, res, next) {
+  
 }
 
 /*
@@ -42,8 +42,19 @@ function checkUsernameExists() {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {
-
+function checkPasswordLength(req, res, next) {
+  if(req.body.password == null || req.body.password.length <= 3) {
+    res.status(422).json({message: "Password must be longer than 3 chars"})
+    return
+  }
+  req.checkedPasswordLength = {password: req.body.password}
+  next()
 }
 
-// Don't forget to add these to the `exports` object so they can be required in other modules
+
+module.exports = {
+  restricted,
+  checkUsernameFree,
+  checkUsernameExists,
+  checkPasswordLength
+}

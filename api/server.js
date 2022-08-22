@@ -21,6 +21,10 @@ server.use(helmet());
 server.use(express.json());
 server.use(cors());
 
+//ROUTER
+const router = require("./auth/auth-router")
+server.use("/api/auth", router)
+
 server.get("/", (req, res) => {
   res.json({ api: "up" });
 });
