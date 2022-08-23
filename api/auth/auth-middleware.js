@@ -1,12 +1,5 @@
 const Users = require("../users/users-model")
-/*
-  If the user does not have a session saved in the server
 
-  status 401
-  {
-    "message": "You shall not pass!"
-  }
-*/
 function restricted(req, res, next) {
   if(req.session.user == null) {
     res.status(401).json({message: "You shall not pass!"})
@@ -14,16 +7,15 @@ function restricted(req, res, next) {
   next()
 }
 
-/*
-  If the username in req.body already exists in the database
-
-  status 422
-  {
-    "message": "Username taken"
-  }
-*/
 function checkUsernameFree(req, res, next) {
-
+  Users.findBy({username: req.body.username}).first() 
+    .then((result) => {
+      if(result != null) {
+          res.status(422).json({ message: 'Username taken'});
+          return;
+      }
+      next()
+    })
 }
 
 function checkUsernameExists(req, res, next) {

@@ -13,7 +13,7 @@ const {
 
 
 //POST -> REGISTER USER
-router.post("/register", checkPasswordLength, (req, res) => {
+router.post("/register", checkPasswordLength, checkUsernameFree, (req, res) => {
   const {username, password} = req.body
   const hash = bcrypt.hashSync(password, 12)
   const user = {username: username, password: hash}
