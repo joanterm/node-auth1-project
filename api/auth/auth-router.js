@@ -11,6 +11,44 @@ const {
   checkPasswordLength
 } = require("./auth-middleware")
 
+
+//POST -> REGISTER USER
+router.post("/register", checkPasswordLength, (req, res) => {
+  const {username, password} = req.body
+  const hash = bcrypt.hashSync(password, 12)
+  const user = {username: username, password: hash}
+  Users.add(user)
+    .then((result) => {
+      res.status(200).json({username: username, user_id: result.user_id})
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+})
+
+//POST -> LOGIN USER
+router.post("/login", checkPasswordLength, checkUsernameExists, (req, res) => {
+  const {username, password} = req.body
+  Users.findBy({"username": username}).first()   
+    .then((result) => {
+      console.log(result)
+      if (bcrypt.compareSync(password, result.password)) {
+        req.session.user = result
+        res.status(200).json({message: `Welcome ${username}`})
+      } else {
+        res.status(401).json({message: "Invalid credentials"})
+        return
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+})
+
+module.exports = router
+
+
+
 /**
   1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
 
@@ -33,41 +71,6 @@ const {
     "message": "Password must be longer than 3 chars"
   }
  */
-
-//POST -> REGISTER USER
-router.post("/register", checkPasswordLength, (req, res) => {
-  const {username, password} = req.body
-  const hash = bcrypt.hashSync(password, 12)
-  const user = {username: username, password: hash}
-  Users.add(user)
-    .then((result) => {
-      res.status(200).json({username: username, user_id: result.user_id})
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-})
-
-
-//POST -> LOGIN USER
-router.post("/login", (req, res) => {
-  const {username, password} = req.body
-  Users.findBy({username}).first()
-    .then((result) => {
-      console.log(result)
-      if (bcrypt.compareSync(password, result.password)) {
-        console.log(username)
-        req.session.user = result
-        res.status(200).json({message: `Welcome ${username}`})
-      } else {
-        res.status(401).json({message: "Invalid credentials"})
-        return
-      }
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-})
 
 /**
   2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
@@ -101,5 +104,5 @@ router.post("/login", (req, res) => {
     "message": "no session"
   }
  */
-  module.exports = router
+
 

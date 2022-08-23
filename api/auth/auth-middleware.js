@@ -23,38 +23,26 @@ function checkUsernameFree(req, res, next) {
 
 }
 
-/*
-  If the username in req.body does NOT exist in the database
-
-  status 401
-  {
-    "message": "Invalid credentials"
-  }
-*/
 function checkUsernameExists(req, res, next) {
-  // if(!req.session.user) {
-  //   res.status(401).json({message: "Invalid credentials"})
-  // }
-  // next()
-
+  Users.findBy({"username": req.body.username}).first()
+  .then((result) => {
+    if(result == null) {
+      res.status(401).json({ message: 'Invalid Credentials'});
+      return;
+    }
+    next()
+  })
 }
 
-/*
-  If password is missing from req.body, or if it's 3 chars or shorter
-
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
-  }
-*/
 function checkPasswordLength(req, res, next) {
   if(req.body.password == null || req.body.password.length <= 3) {
     res.status(422).json({message: "Password must be longer than 3 chars"})
     return
   }
-  req.checkedPasswordLength = {password: req.body.password}
+  req.user = {username: req.body.username, password: req.body.password}
   next()
 }
+
 
 
 module.exports = {
