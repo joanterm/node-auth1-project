@@ -45,6 +45,21 @@ router.post("/login", checkPasswordLength, checkUsernameExists, (req, res) => {
     })
 })
 
+//GET -> LOGOUT
+router.get("/logout", (req, res) => {
+  if(req.session.user) {
+    req.session.destroy((err) => {
+      if(err) {
+        res.json({message: err})
+      } else {
+        res.status(200).json({message: "logged out"})
+      }
+    })
+  } else {
+      res.status(200).json({message: "no session"})
+  }
+})
+
 module.exports = router
 
 
@@ -87,7 +102,6 @@ module.exports = router
     "message": "Invalid credentials"
   }
  */
-
 
 /**
   3 [GET] /api/auth/logout
