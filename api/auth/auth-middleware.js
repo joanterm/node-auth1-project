@@ -7,8 +7,11 @@ const Users = require("../users/users-model")
     "message": "You shall not pass!"
   }
 */
-function restricted() {
-
+function restricted(req, res, next) {
+  if(req.session.user == null) {
+    res.status(401).json({message: "You shall not pass!"})
+  }
+  next()
 }
 
 /*

@@ -40,6 +40,9 @@ server.use(session(sessionConfig))
 //ROUTER
 const router = require("./auth/auth-router")
 server.use("/api/auth", router)
+const userRouter = require("./users/users-router")
+server.use("/api/users", userRouter)
+
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
